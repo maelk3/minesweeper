@@ -23,7 +23,7 @@ class Game:
         self.bomb_map = [[0 for j in range(width)] for i in range(height)]
         for k in range(self.nb_bombs):
             i, j = random.randrange(0, height), random.randrange(0, width)
-            while(self.bomb_map[i][j] == BOMB):
+            while (self.bomb_map[i][j] == BOMB) or (i-self.height//2)**2+(j-self.width//2)**2 <= (min(self.height//3, 5))**2:
                 i, j = random.randrange(0, height), random.randrange(0, width)
             self.bomb_map[i][j] = BOMB
 
@@ -130,8 +130,6 @@ class Game:
                     if curses.BUTTON1_CLICKED & code != 0 and self.board[mx][my] == UNDISCOVERED:
                         if self.bomb_map[mx][my] != BOMB:
                             self.uncover_cell(mx, my, stdscr)
-                            stdscr.move(self.x_offset+mx, self.y_offset+my)
-                            stdscr.refresh()
                         else:
                             self.game_over_screen(mx, my, stdscr)
                             stdscr.getch()
@@ -139,12 +137,14 @@ class Game:
                         
                     elif curses.BUTTON3_CLICKED & code != 0 and self.board[mx][my] != DISCOVERED:
                         self.toggle_flag(mx, my, stdscr)
-                        stdscr.move(self.x_offset+mx, self.y_offset+my)                        
-                        stdscr.refresh()                        
+
                         if self.win():
                             self.win_screen(stdscr)
                             stdscr.getch()
                             return
+                        
+                    stdscr.move(self.x_offset+mx, self.y_offset+my)                        
+                    stdscr.refresh()
                                         
 def main(stdscr):
     
@@ -168,7 +168,7 @@ def main(stdscr):
               curses.COLOR_YELLOW,  # 8
               curses.COLOR_YELLOW,  # 9
               curses.COLOR_RED,     # flag
-              curses.COLOR_MAGENTA] # undiscovered cell
+              curses.COLOR_BLUE] # undiscovered cell
     for i in range(len(colors)):
         curses.init_pair(i+1, colors[i], curses.COLOR_BLACK)
     
